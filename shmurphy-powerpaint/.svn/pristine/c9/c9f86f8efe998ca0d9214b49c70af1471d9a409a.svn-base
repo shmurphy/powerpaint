@@ -1,0 +1,28 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+
+package tools;
+
+import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
+
+/**
+ * pencil.
+ * 
+ * @author Shannon Murphy
+ * @version 2/20/15
+ *
+ */
+public class LineTool extends AbstractTool {
+
+    /**
+     * @param theName
+     * @param theIcon
+     */
+    public LineTool() {
+        super("Line", new ImageIcon("./images/line.gif"), KeyEvent.VK_L);
+    }
+
+}

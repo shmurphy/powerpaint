@@ -1,0 +1,53 @@
+/**
+ * 
+ */
+package actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JPanel;
+
+import tools.Tool;
+
+/**
+ * @author Kevin
+ *
+ */
+public class RectangleAction extends AbstractAction {
+
+    /**
+     * 
+     */
+    private Tool myTool;
+    
+    /** */ 
+    private JPanel myPanel;
+
+    /**
+     * @param name
+     */
+    public RectangleAction(final JPanel thePanel, final Tool theTool) {
+        super(theTool.getName(), theTool.getIcon());
+        putValue(Action.SELECTED_KEY, true);
+        putValue(Action.MNEMONIC_KEY, theTool.getMnemonic());
+        myTool = theTool;
+        myPanel = thePanel;
+    }
+    
+    public Tool getTool() {
+        return myTool;
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    @Override
+    public void actionPerformed(final ActionEvent theEvent) {
+        myPanel.setName((String) getValue(Action.NAME));
+        myPanel.repaint();
+    }
+
+}

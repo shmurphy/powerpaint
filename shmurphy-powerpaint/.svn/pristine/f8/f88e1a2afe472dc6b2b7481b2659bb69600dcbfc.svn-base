@@ -1,0 +1,218 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+package gui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.JPanel;
+
+import tools.Tool;
+
+/**
+ * Creates the JPanel that holds the drawing area.
+ * 
+ * @author Shannon Murphy
+ * @version 7 February 2015
+ */
+@SuppressWarnings("serial")
+public class DrawingPanel extends JPanel {
+    // constants for the JPanel
+    
+    /** The color of the background. */
+    private static final Color BACKGROUND_COLOR = Color.WHITE;
+    
+    /** The size for the panel. */
+    private static final Dimension PANEL_SIZE = new Dimension(400, 200);
+    
+    // instance fields
+    
+    /** The starting point for the shape to be drawn. */
+    private Point myStartPoint;
+    
+    /** The end point for the shape to be drawn. */
+    private Point myEndPoint;
+    
+    /** A Collection of Shapes that have been drawn already. */
+    private final List<DrawnShape> myShapes;
+    
+    /** The drawing Tool that is currently being used. */
+    private Tool myCurrentTool;
+
+    /** The stroke chosen by the user for drawing. */
+    private BasicStroke myStroke;
+    
+    /** The Color that is chosen by the user for drawing. */
+    private Color myColor;
+    
+    private Path2D.Double myPath;
+    /** Path for drawing the Pencil tool. */
+    private int x1 ;
+    private int y1 ;
+    private int cx,cy;
+    
+    private List<Point> myPoints;
+    
+    /** The name used for firing the property change.
+     * TODO. */
+    private String myName;
+    
+    /**
+     * Constructor to initialize fields.
+     */
+    public DrawingPanel() {
+        super();
+        myShapes = new ArrayList<DrawnShape>();
+        setPreferredSize(PANEL_SIZE);
+        setBackground(BACKGROUND_COLOR);
+        addMouseListener(new MyMouseListener());
+        addMouseMotionListener(new MyMouseListener());
+        myStroke = new BasicStroke(1);
+        myColor = Color.BLACK;
+        myPath = new Path2D.Double();
+        myPoints = new ArrayList<Point>();
+    }
+    
+    /** 
+     * Sets the myName field to use for the property change.
+     * @param theName the name of the Event that changed.
+     * TODO.
+     */
+    public void setName(final String theName) {
+        firePropertyChange("text", myName, theName);
+        myName = theName;
+    }
+    
+    /**
+     * Sets the myCurrentTool field to whatever Tool is selected (Pencil, Line, 
+     * Ellipse, or Rectangle).
+     * @param theTool the current Tool.
+     */
+    public void setTool(final Tool theTool) {
+        myCurrentTool = theTool;
+    }
+    
+    /**
+     * Sets the myColor field to the Color selected by the user.
+     * @param theColor the current Color.
+     */
+    public void setColor(final Color theColor) {
+        myColor = theColor;
+    }
+    
+    /**
+     * Draws Shapes on the panel.
+//     * {@inheritDoc}
+     */
+    @Override
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+        
+        if (myStartPoint != null && myEndPoint != null) {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                 RenderingHints.VALUE_ANTIALIAS_ON);
+        //    g2d.setPaint(myColor);
+            g2d.setStroke(new BasicStroke(2)); 
+
+            final Iterator<DrawnShape> itr = myShapes.iterator();
+            while (itr.hasNext()) {
+                final DrawnShape drawn = (DrawnShape) itr.next();
+                final Shape shape = (Shape) drawn.getShape();
+                final Color color = (Color) drawn.getColor();
+                g2d.setPaint(color);
+                g2d.draw(shape);
+            }
+         //   g2d.setPaint(Color.LIGHT_GRAY);
+            g2d.setPaint(myColor); 
+            g2d.draw(checkTool()); 
+        } 
+    }
+    
+    /**
+     * Returns the Shape to be drawn based on which Tool is selected.
+     * 
+     * @return a Shape to be drawn (Pencil, Line2D, Ellipse2D, or Rectangle2D).
+     */
+    private Shape checkTool() {
+        Shape shape = null;
+        if ("Line".equals(myCurrentTool.getName())) {
+            final Line2D.Double line = new Line2D.Double(myStartPoint.x, myStartPoint.y, 
+                                          myEndPoint.x, myEndPoint.y);
+            shape = line;
+        } else if ("Rectangle".equals(myCurrentTool.getName())) {
+            final Rectangle2D.Double rect = new Rectangle2D.Double();
+            rect.setFrameFromDiagonal(myStartPoint, myEndPoint);
+            shape = rect;
+        } else if ("Ellipse".equals(myCurrentTool.getName())) {
+            final Ellipse2D.Double ellipse = new Ellipse2D.Double();
+            ellipse.setFrameFromDiagonal(myStartPoint, myEndPoint);
+            shape = ellipse;
+        } else if ("Pencil".equals(myCurrentTool.getName())) {
+            shape = myPath;
+        }
+        return shape;
+    }
+    
+    /**
+     * Listens for mouse dragged and mouse pressed to draw on the panel.
+     */
+    private class MyMouseListener extends MouseAdapter {
+        @Override
+        public void mouseDragged(final MouseEvent theEvent) {
+            myEndPoint = new Point(theEvent.getX(), theEvent.getY());
+            
+            myPath.moveTo(theEvent.getX(), theEvent.getY());
+            myPath.lineTo(theEvent.getX(), theEvent.getY());
+
+            
+            repaint();
+        }
+        @Override
+        public void mousePressed(final MouseEvent theEvent) {
+            myStartPoint = new Point(theEvent.getX(), theEvent.getY());
+            myEndPoint = myStartPoint;
+//            if (myPath.getCurrentPoint() == null) {
+//                myPath.moveTo(theEvent.getX(), theEvent.getY());
+//            } 
+      //      repaint();
+            
+        }   
+        @Override
+        public void mouseReleased(final MouseEvent theEvent) { 
+            myShapes.add(new DrawnShape(checkTool(), myColor, myStroke));
+            myStartPoint = null;
+            myEndPoint = null;
+            
+            myPath.lineTo(theEvent.getX(), theEvent.getY());
+            myPoints.add(theEvent.getPoint());
+        }
+//        @Override
+//        public void mouseClicked(final MouseEvent theEvent) {
+//            if (myPath.getCurrentPoint() == null) {
+//                myPath.moveTo(theEvent.getX(), theEvent.getY());
+//            } else if (theEvent.getClickCount() == 2) {
+//                myPath.closePath();
+//            } else {
+//                myPath.lineTo(theEvent.getX(), theEvent.getY());
+//            }
+//            repaint();
+//        }
+    }
+}

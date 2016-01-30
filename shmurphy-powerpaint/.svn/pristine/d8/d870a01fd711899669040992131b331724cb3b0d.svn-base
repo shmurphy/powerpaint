@@ -1,0 +1,51 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+
+package gui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+
+/**
+ * Represents shapes already drawn.
+ * 
+ * @author Shannon Murphy
+ * @version 2/20/15
+ *
+ */
+public class DrawnShape {
+
+    /** The type of shape. */
+    private Shape myShape;
+    
+    /** The color. */
+    private Color myColor;
+    
+    /** The thickness. */
+    private BasicStroke myThickness;
+    
+    /**
+     * TODO.
+     */
+    public DrawnShape(final Shape theShape, final Color theColor, final BasicStroke theThickness) {
+        myShape = theShape;
+        myColor = theColor;
+        myThickness = theThickness;
+    }
+    
+    public Shape getShape() {
+        return myShape;
+    }
+    
+    public Color getColor() {
+        return myColor;
+    }
+    
+    public BasicStroke getThickness() {
+        return myThickness;
+    }
+
+}

@@ -1,0 +1,236 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+package gui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+//import java.awt.Shape;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+//import java.awt.event.MouseListener;
+//import java.awt.event.MouseMotionListener;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+
+import tools.EllipseTool;
+import tools.LineTool;
+import tools.PencilTool;
+import tools.RectangleTool;
+import tools.Tool;
+
+/**
+ * Creates the JPanel that holds the drawing area.
+ * 
+ * @author Shannon Murphy
+ * @version 7 February 2015
+ */
+@SuppressWarnings("serial")
+public class DrawingPanel extends JPanel {
+    // constants for the JPanel
+    
+    /** The color of the background. */
+    private static final Color BACKGROUND_COLOR = Color.WHITE;
+    
+    /** The size for the panel. */
+    private static final Dimension PANEL_SIZE = new Dimension(400, 200);
+    
+    // instance fields
+    
+    /** The 2D Line to be drawn. */
+    private Line2D myLine;
+    
+    /** The 2D Ellipse to be drawn. */
+    private Ellipse2D myEllipse;
+    
+    private Rectangle2D myRect;
+    
+    /** The starting point for the line. */
+    private Point myStartPoint;
+    
+    /** The end point for the line. */
+    private Point myEndPoint;
+    
+    /** A list of color actions. */
+    private List<ToolAction> myToolActions;
+    
+    /** TODO. */
+    private Tool myCurrentTool;
+
+    private BasicStroke myStroke;
+    
+    private List<DrawnShape> myShapes;
+    
+    /**
+     * Constructor to initialize fields.
+     */
+    public DrawingPanel() {
+        super();
+        myShapes = new ArrayList<DrawnShape>();
+        setUpTools();
+        setPreferredSize(PANEL_SIZE);
+        setBackground(BACKGROUND_COLOR);
+        addMouseListener(new MyMouseListener());
+        addMouseMotionListener(new MyMouseListener());
+        myStroke = new BasicStroke(1);
+    }
+    
+    /** TODO.
+     * 
+     */
+    private void setUpTools() {
+        myToolActions = new ArrayList<ToolAction>();
+        myToolActions.add(new ToolAction(new PencilTool()));
+        myToolActions.add(new ToolAction(new LineTool()));
+        myToolActions.add(new ToolAction(new EllipseTool()));
+        myToolActions.add(new ToolAction(new RectangleTool()));
+    }
+    
+    /**
+     * @return a fully-stocked tool bar.
+     */
+    public JToolBar createToolBar() {
+        final JToolBar bar = new JToolBar();
+        bar.addSeparator();       
+        
+        final ButtonGroup btngrp = new ButtonGroup();
+        for (final ToolAction ta : myToolActions) {
+            final JToggleButton tb = new JToggleButton(ta);
+            btngrp.add(tb);
+            bar.add(tb);
+        }
+        btngrp.clearSelection();
+
+        return bar;
+    }
+    
+    /**
+     * @return a fully-stocked menu bar.
+     */
+    public JMenu createToolMenu() {
+        final JMenu menu = new JMenu("Tools");
+        
+        final ButtonGroup btngrp = new ButtonGroup();
+
+        for (final ToolAction ta : myToolActions) {
+            final JRadioButtonMenuItem btn = new JRadioButtonMenuItem(ta);
+            btngrp.add(btn);
+            menu.add(btn);
+        }
+        menu.setMnemonic(KeyEvent.VK_T);
+        return menu;
+    }
+    
+    /**
+     * Draws a line on the panel.
+     * 
+     * @param theGraphics the graphic.
+     */
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+        if (myStartPoint != null && myEndPoint != null) {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                 RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setPaint(Color.BLACK);
+            g2d.setStroke(myStroke);
+            if ("Line".equals(myCurrentTool.getName())) {
+                g2d.draw(myLine);
+            } else if ("Rectangle".equals(myCurrentTool.getName())) {
+                g2d.draw(myRect);
+            } else if ("Ellipse".equals(myCurrentTool.getName())) {
+                g2d.draw(myEllipse);
+            }
+        }    
+    }
+    
+    
+    /**
+     * Listens for mouse dragged and mouse pressed, to draw on the panel.
+     */
+    private class MyMouseListener extends MouseAdapter {
+        @Override
+        public void mouseDragged(final MouseEvent theEvent) {
+
+            myEndPoint = theEvent.getPoint();
+//            myEllipse = new Ellipse2D.Double(myStartPoint.x, myStartPoint.y, myEndPoint.x, myEndPoint.y); 
+            myLine = new Line2D.Double(myStartPoint, myEndPoint);
+//            myRect = new Rectangle2D.Double(myStartPoint.x, myStartPoint.y, myEndPoint.x, myEndPoint.y);
+            
+            myRect = new Rectangle2D.Double();
+            myRect.setFrameFromDiagonal(myStartPoint, myEndPoint);
+            myEllipse = new Ellipse2D.Double();
+            myEllipse.setFrameFromDiagonal(myStartPoint, myEndPoint);
+
+            repaint();
+        }
+        @Override
+        public void mousePressed(final MouseEvent theEvent) {
+            myStartPoint = theEvent.getPoint();
+        }
+        
+        @Override
+        public void mouseReleased(final MouseEvent theEvent) {
+            myEndPoint = theEvent.getPoint();
+        }
+    }
+    
+    /**
+     * TODO.
+     */
+    private class ToolAction extends AbstractAction {
+        
+        /** The tool to use. */
+        private final Tool myTool;
+
+        private final String myName;
+        /**
+         * TODO.
+         */
+        public ToolAction(final Tool theTool) {
+            super(theTool.getName(), theTool.getIcon());
+            putValue(Action.SELECTED_KEY, true);
+            putValue(Action.MNEMONIC_KEY, theTool.getMnemonic());
+            myTool = theTool;
+            myName = theTool.getName();
+        }
+        
+        public String getName() {
+            return myName;
+        }
+
+        /**
+         * TODO.
+         * 
+         * @param theEvent The event, ignored.
+         */
+        @Override
+        public void actionPerformed(final ActionEvent theEvent) {
+        //    System.out.println(theEvent.getSource());
+            myCurrentTool = myTool;
+            System.out.println(myCurrentTool.getName());
+            repaint();
+        }
+    }
+}

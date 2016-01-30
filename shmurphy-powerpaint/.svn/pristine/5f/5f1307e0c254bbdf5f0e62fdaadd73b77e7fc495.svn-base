@@ -1,0 +1,209 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+package gui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+//import java.awt.Shape;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
+
+import java.util.Objects;
+//import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+
+
+
+
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+//import java.awt.geom.Rectangle2D;
+//import java.util.ArrayList;
+//import java.util.List;
+import javax.swing.JPanel;
+
+import tools.Tool;
+
+/**
+ * Creates the JPanel that holds the drawing area.
+ * 
+ * @author Shannon Murphy
+ * @version 7 February 2015
+ */
+@SuppressWarnings("serial")
+public class DrawingPanel extends JPanel {
+    // constants for the JPanel
+    
+    /** The color of the background. */
+    private static final Color BACKGROUND_COLOR = Color.WHITE;
+    
+    /** The size for the panel. */
+    private static final Dimension PANEL_SIZE = new Dimension(400, 200);
+    
+    /** An object to represent that no point is assigned. */
+    private static final Point NO_POINT = null;
+    
+    // instance fields
+    
+//    /** The 2D Line to be drawn. */
+//    private Line2D myLine;
+//    
+//    /** The 2D Ellipse to be drawn. */
+//    private Ellipse2D myEllipse;
+//    
+//    /** rect. */
+//    private Rectangle2D myRect;
+    
+    /** The starting point for the line. */
+    private Point myStartPoint;
+    
+    /** The end point for the line. */
+    private Point myEndPoint;
+    
+    /** A collection of Points representing lines. */
+    private final List<Point> myLines;
+    
+    /** A list of color actions. */
+//    private List<ToolAction> myToolActions;
+    
+    /** TODO. */
+    private Tool myCurrentTool;
+
+    /** TODO. */
+    private BasicStroke myStroke;
+    
+    /** TODO. */
+  //  private final List<DrawnShape> myShapes;
+    
+    /** TODO. */
+    private final Color myColor;
+    
+    private String myName;
+    
+    /**
+     * Constructor to initialize fields.
+     */
+    public DrawingPanel() {
+        super();
+   //     myShapes = new ArrayList<DrawnShape>();
+        myLines = new ArrayList<Point>();
+        setPreferredSize(PANEL_SIZE);
+        setBackground(BACKGROUND_COLOR);
+        addMouseListener(new MyMouseListener());
+        addMouseMotionListener(new MyMouseListener());
+        myStroke = new BasicStroke(1);
+        myColor = Color.BLACK;
+        
+    }
+    
+    /**
+     * Records the start point for a shape.
+     * 
+     * @param thePoint the start point of a shape.
+     */
+    public void recordStartPoint(final Point thePoint) {
+        if (myEndPoint != null) { // starting a new line, so record the previous line
+            myLines.add(myStartPoint);
+            myLines.add(myEndPoint);
+        }
+        myStartPoint = thePoint;
+        myEndPoint = NO_POINT; // still need to capture the end point
+    }
+    
+    /**
+     * Records the current position of the mouse during a drag.
+     * 
+     * @param thePoint the end point of the shape
+     */
+    public void recordDragPoint(final Point thePoint) {
+        myEndPoint = (Point) thePoint.clone();
+        repaint();
+    }
+    
+    public void setName(final String theName) {
+        firePropertyChange("text", myName, theName);
+        myName = theName;
+    }
+    
+    public void setTool(final Tool theTool) {
+        myCurrentTool = theTool;
+    //    System.out.println(myCurrentTool.getName());
+    }
+    
+//    public void setThickness(final int theThickness) {
+//        myStroke = new BasicStroke(theThickness);
+//    }
+    
+    /**
+     * Draws a line on the panel.
+     * 
+     * @param theGraphics the graphic.
+     */
+    public void paintComponent(final Graphics theGraphics) {
+        super.paintComponent(theGraphics);
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+        
+        if (myStartPoint != null && myEndPoint != null) {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                 RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setPaint(myColor);
+            g2d.setStroke(myStroke); 
+            if (myCurrentTool.getName().equals("Line")) {
+                drawLine(theGraphics);
+            }
+        }    
+    }
+    
+    /** draw a line. 
+     * @param theGraphics TODO.
+     * @return line.
+     */
+    private Line2D.Double drawLine(final Graphics theGraphics) {
+        final Graphics2D g2d = (Graphics2D) theGraphics;
+        Line2D.Double line = null;
+        
+        for (int i = 0; i < myLines.size(); i += 2) {
+            final Point p1 = myLines.get(i);
+            final Point p2 = myLines.get(i + 1);
+            line = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
+            g2d.draw(line);
+        }
+        if (!Objects.equals(myEndPoint, NO_POINT)) { // using a feature of Java 7
+            line = new Line2D.Double(myStartPoint.x, myStartPoint.y,
+                                     myEndPoint.x, myEndPoint.y);
+            g2d.draw(line);
+        }
+        return line;
+    }
+    
+    
+    /**
+     * Listens for mouse dragged and mouse pressed, to draw on the panel.
+     */
+    private class MyMouseListener extends MouseAdapter {
+        @Override
+        public void mouseDragged(final MouseEvent theEvent) {
+            recordDragPoint(theEvent.getPoint());           
+            repaint();
+        }
+        @Override
+        public void mousePressed(final MouseEvent theEvent) {
+            recordStartPoint(theEvent.getPoint());
+        }
+        
+//        @Override
+//        public void mouseReleased(final MouseEvent theEvent) {
+//            myEndPoint = theEvent.getPoint();
+//        }
+    }
+}

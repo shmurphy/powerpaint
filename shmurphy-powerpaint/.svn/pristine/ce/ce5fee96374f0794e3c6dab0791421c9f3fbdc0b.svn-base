@@ -1,0 +1,33 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+
+package tools;
+
+import javax.swing.ImageIcon;
+
+/**
+ * An interface for filters that modify images.
+ * 
+ * @author Shannon Murphy
+ * @version 2/20/15
+ */
+public interface Tool {
+    /**
+     * TODO. 
+     * @return the name.
+     */
+    String getName();
+
+    /**
+     * TODO.
+     * @return the image.
+     */
+    ImageIcon getIcon();
+    
+    /**
+     * TODO.
+     * @return the mnemonic.
+     */
+    int getMnemonic();
+}

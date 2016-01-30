@@ -1,0 +1,193 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+package gui;
+
+//import java.awt.BorderLayout;
+//import java.awt.Dimension;
+//import java.awt.Toolkit;
+//
+//import javax.swing.JButton;
+//import javax.swing.JFileChooser;
+import java.awt.BorderLayout;
+//import java.awt.Color;
+import java.awt.Dimension;
+//import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javafx.scene.control.ToggleButton;
+
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+//import javax.swing.JColorChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+//import javax.swing.JLabel;
+//import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+
+
+/**
+ * Displays the GUI.
+ * 
+ * @author Shannon Murphy
+ * @version 7 February 2015
+ *
+ */
+public class PowerPaintGUI {
+    
+    // constants to capture screen dimensions
+    /** A ToolKit. */
+    private static final Toolkit KIT = Toolkit.getDefaultToolkit();
+    
+    /** The Dimension of the screen. */
+    private static final Dimension SCREEN_SIZE = KIT.getScreenSize();
+    
+    // instance fields
+    /** The frame for this application's GUI. */
+    private final JFrame myFrame;
+    
+    /** The panel where drawings are made. */
+    private final DrawingPanel myDrawPanel;
+    
+    /** MenuBar. */
+    private final JMenuBar myMenuBar;
+    
+    /** List of the image names. */
+    private final List<String> myImageNames;
+    
+    /** Button group for the ToolBar buttons. */
+    private final ButtonGroup myToolBarGroup;
+    
+    /**
+     * Constructor to initialize fields.
+     */
+    public PowerPaintGUI() {
+        myFrame = new JFrame("TCSS 305 PowerPaint");
+        myDrawPanel = new DrawingPanel();
+        myMenuBar = new JMenuBar();   
+        myImageNames = new ArrayList<>();
+        myToolBarGroup = new ButtonGroup();
+        createImageNames();
+    } 
+    
+    /**
+     * Sets up and displays the GUI for this application.
+     */
+    public void start() {     
+        myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);      
+        setupComponents();
+        myFrame.pack();
+        myFrame.setVisible(true);   
+        myFrame.setLocation(SCREEN_SIZE.width / 2 - myFrame.getWidth() / 2,
+                            SCREEN_SIZE.height / 2 - myFrame.getHeight() / 2);
+    }
+    
+    /**
+     * Sets up the components in this frame.
+     */
+    private void setupComponents() {        
+        myFrame.add(myDrawPanel, BorderLayout.CENTER);
+        setUpMenu();
+        myFrame.setJMenuBar(myMenuBar);
+        myFrame.setIconImage(new ImageIcon("images//paint.png").getImage());
+    }     
+    
+    /**
+     * Sets up the menu bar for this frame.
+     */
+    private void setUpMenu() {   
+        createFileMenu();
+        createOptionMenu();
+        createToolMenu();
+        createHelpMenu();
+        createColorMenu();
+     //   myFrame.add(myDrawPanel, BorderLayout.CENTER);
+        createToolBar();
+    } 
+    
+    /** Creates the image name map. */
+    private void createImageNames() {
+        myImageNames.add("Pencil");
+        myImageNames.add("Line");
+        myImageNames.add("Rectangle");
+        myImageNames.add("Ellipse");
+    }
+    
+    /** Creates the file menu. */
+    private void createFileMenu() {
+        final JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+        final JMenuItem fileUndo = new JMenuItem("Undo all changes",
+                                                 KeyEvent.VK_U);
+        fileUndo.setEnabled(false);
+        final JMenuItem fileExit = new JMenuItem("Exit", KeyEvent.VK_X);     
+        fileMenu.add(fileUndo);
+        fileMenu.add(fileExit);
+        myMenuBar.add(fileMenu);
+    }
+    
+    /** Creates the option menu. */
+    private void createOptionMenu() {
+        final JMenu optionMenu = new JMenu("Options");
+        optionMenu.setMnemonic(KeyEvent.VK_O);
+        final JCheckBoxMenuItem optionGrid = new JCheckBoxMenuItem("Grid");
+        optionGrid.setMnemonic(KeyEvent.VK_G);
+        optionMenu.add(optionGrid);
+        final JMenu optionThickness = new JMenu("Thickness");
+        optionThickness.setMnemonic(KeyEvent.VK_T);
+        
+        final JSlider thickSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 20, 1);
+        thickSlider.setMajorTickSpacing(5);
+        thickSlider.setMinorTickSpacing(1);
+        thickSlider.setPaintLabels(true);
+        thickSlider.setPaintTicks(true);
+        
+        optionThickness.add(thickSlider);        
+        optionMenu.add(optionThickness);
+        myMenuBar.add(optionMenu);
+    }
+    
+    /** Creates the tool menu. */
+    private void createToolMenu() {
+        final JMenu toolMenu = myDrawPanel.createToolMenu();
+        myMenuBar.add(toolMenu);
+    }
+    
+    /** Creates the help menu. */
+    private void createHelpMenu() {
+        final JMenu helpMenu = new JMenu("Help");
+        final JMenuItem helpAbout = new JMenuItem("About...", KeyEvent.VK_A);
+        helpMenu.add(helpAbout);      
+        helpMenu.setMnemonic(KeyEvent.VK_H);
+        myMenuBar.add(helpMenu);
+    }
+    
+    /** Creates the color menu. */
+    private void createColorMenu() {
+        final JMenuItem colorMenu = new JMenuItem("Color...");
+        colorMenu.setMnemonic(KeyEvent.VK_C);
+        myMenuBar.add(colorMenu);
+    }
+    
+    /** 
+     * Creates the ToolBar and adds the buttons to it. Also adds the ToolBar buttons to the
+     * ToolBar ButtonGroup.
+     */
+    private void createToolBar() {
+        final JToolBar toolBar = myDrawPanel.createToolBar();
+        myFrame.add(toolBar, BorderLayout.SOUTH);
+    }
+}

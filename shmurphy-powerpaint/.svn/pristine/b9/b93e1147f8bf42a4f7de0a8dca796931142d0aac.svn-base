@@ -1,0 +1,57 @@
+/**
+ * 
+ */
+package actions;
+
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+//import javax.swing.Icon;
+import javax.swing.JPanel;
+
+import tools.Tool;
+
+/**
+ * Action for a line.
+ * 
+ * @author Shannon Murphy
+ * @version 2/20/15
+ */
+@SuppressWarnings("serial")
+public class LineAction extends AbstractAction {
+
+    /**
+     * 
+     */
+    private final Tool myTool;
+    
+    /** */ 
+    private final JPanel myPanel;
+
+    /**
+     * @param thePanel TODO.
+     * @param theTool TODO.
+     */
+    public LineAction(final JPanel thePanel, final Tool theTool) {
+        super(theTool.getName(), theTool.getIcon());
+        putValue(Action.SELECTED_KEY, true);
+        putValue(Action.MNEMONIC_KEY, theTool.getMnemonic());
+        myTool = theTool;
+        myPanel = thePanel;
+    }
+    
+    /** @return TODO. */
+    public Tool getTool() {
+        return myTool;
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    @Override
+    public void actionPerformed(final ActionEvent theEvent) {
+        myPanel.setName((String) getValue(Action.NAME));
+    }
+
+}

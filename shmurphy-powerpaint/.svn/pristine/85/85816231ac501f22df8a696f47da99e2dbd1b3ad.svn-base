@@ -1,0 +1,43 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+package gui;
+
+import java.awt.Color;
+import java.awt.Dimension;
+
+import javax.swing.JPanel;
+
+/**
+ * Creates the JPanel that holds the drawing area.
+ * 
+ * @author Shannon Murphy
+ * @version 7 February 2015
+ */
+@SuppressWarnings("serial")
+public class DrawingPanel extends JPanel {
+    // constants for size 
+    /** The width of this panel. */
+    private static final int WIDTH = 400;
+    
+    /** The height of this panel. */
+    private static final int HEIGHT = 200;
+    
+    // instance fields
+    /** The size of this panel. */
+    private final Dimension mySize;
+    
+    /** The color of the background. */
+    private final Color myColor;
+    
+    /**
+     * Constructor to initialize fields.
+     */
+    public DrawingPanel() {
+        super();
+        mySize = new Dimension(WIDTH, HEIGHT);
+        myColor = Color.WHITE;
+        setPreferredSize(mySize);
+        setBackground(myColor);
+    }
+}

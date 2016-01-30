@@ -1,0 +1,28 @@
+/*
+ * TCSS 305 - Assignment 5: PowerPaint
+ */
+
+package tools;
+
+import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
+
+/**
+ * pencil.
+ * 
+ * @author Shannon Murphy
+ * @version 2/20/15
+ *
+ */
+public class RectangleTool extends AbstractTool {
+
+    /**
+     * @param theName
+     * @param theIcon
+     */
+    public RectangleTool() {
+        super("Rectangle", new ImageIcon("./images/rectangle.gif"), KeyEvent.VK_R);
+    }
+
+}
